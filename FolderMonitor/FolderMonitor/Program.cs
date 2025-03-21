@@ -20,7 +20,7 @@
             string password = Console.ReadLine();
 
             FileMonitor monitor = new FileMonitor(folderPath, username, password);
-            
+
             Console.WriteLine($"Monitoring {folderPath} for new files...");
             Console.ReadLine();
         }

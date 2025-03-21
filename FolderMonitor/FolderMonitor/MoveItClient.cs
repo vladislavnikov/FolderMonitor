@@ -51,6 +51,21 @@ namespace FolderMonitor
             Console.WriteLine("Authentication successful!");
             return true;
         }
+
+        public async Task<int?> GetHomeFolderIdAsync()
+        {
+            var response = await _httpClient.GetAsync(Endpoints.USER);
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var userData = JsonSerializer.Deserialize<UserResponse>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+
+            return userData?.HomeFolderID;
+        }
+
     }
 
 }
