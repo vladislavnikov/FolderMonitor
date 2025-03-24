@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace FolderMonitor
 {
+    /// <summary>
+    /// Client for interacting with the MOVEit Transfer API.
+    /// </summary>
     public class MoveItClient
     {
         private readonly HttpClient _httpClient;
@@ -19,6 +22,12 @@ namespace FolderMonitor
             _httpClient = new HttpClient { BaseAddress = new Uri(Endpoints.BASE_URL) };
         }
 
+        /// <summary>
+        /// Authenticates the user with the MOVEit Transfer API.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <returns>True if authentication is successful; otherwise, false.</returns>
         public async Task<bool> AuthenticateAsync(string username, string password)
         {
             var requestBody = new FormUrlEncodedContent(new[]
@@ -54,6 +63,10 @@ namespace FolderMonitor
             return true;
         }
 
+        /// <summary>
+        /// Retrieves the user's home folder ID from the MOVEit Transfer API.
+        /// </summary>
+        /// <returns>The home folder ID, or null if retrieval fails.</returns>
         public async Task<int?> GetHomeFolderIdAsync()
         {
             var response = await _httpClient.GetAsync(Endpoints.USER);
