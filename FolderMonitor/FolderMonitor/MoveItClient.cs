@@ -12,6 +12,8 @@ namespace FolderMonitor
         private string _refreshToken;
         private DateTime _tokenExpiry;
 
+        public HttpClient HttpClient => _httpClient;
+
         public MoveItClient()
         {
             _httpClient = new HttpClient { BaseAddress = new Uri(Endpoints.BASE_URL) };
@@ -21,9 +23,9 @@ namespace FolderMonitor
         {
             var requestBody = new FormUrlEncodedContent(new[]
             {
-            new KeyValuePair<string, string>("grant_type", "password"),
-            new KeyValuePair<string, string>("username", username),
-            new KeyValuePair<string, string>("password", password)
+                new KeyValuePair<string, string>("grant_type", "password"),
+                new KeyValuePair<string, string>("username", username),
+                new KeyValuePair<string, string>("password", password)
             });
 
             var response = await _httpClient.PostAsync(Endpoints.TOKEN, requestBody);
@@ -45,7 +47,7 @@ namespace FolderMonitor
 
             _accessToken = data.AccessToken;
             _refreshToken = data.RefreshToken;
-            _tokenExpiry = DateTime.UtcNow.AddSeconds(data.ExpiresIn - 60); 
+            _tokenExpiry = DateTime.UtcNow.AddSeconds(data.ExpiresIn - 60);
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
             Console.WriteLine("Authentication successful!");
@@ -59,13 +61,11 @@ namespace FolderMonitor
             if (!response.IsSuccessStatusCode)
                 return null;
 
+
             var jsonResponse = await response.Content.ReadAsStringAsync();
             var userData = JsonSerializer.Deserialize<UserResponse>(jsonResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-
             return userData?.HomeFolderID;
         }
-
     }
-
 }

@@ -1,26 +1,35 @@
-﻿namespace FolderMonitor
+﻿using System.Net.Http;
+
+namespace FolderMonitor
 {
     public class FileMonitor
     {
-        private readonly FileSystemWatcher _watcher;
-        private readonly MoveItClient _moveItClient;
-        private int? _homeFolderId;
+        private readonly string _folderPath;
+        private readonly FileActions _fileActions;
+        private readonly int? _homeFolderId;
 
-        public FileMonitor(string folderPath, string username, string password)
+        public FileMonitor(string folderPath, FileActions fileActions, int? homeFolderId)
         {
-            _watcher = new FileSystemWatcher(folderPath) { EnableRaisingEvents = true, Filter = "*.*", NotifyFilter = NotifyFilters.FileName };
-           
-            _moveItClient = new MoveItClient();
-            AuthenticateAndSetHomeFolder(username, password).Wait();
-        }
+            _folderPath = folderPath;
+            _fileActions = fileActions;
+            _homeFolderId = homeFolderId;
 
-        private async Task AuthenticateAndSetHomeFolder(string username, string password)
-        {
-            if (await _moveItClient.AuthenticateAsync(username, password))
+            var watcher = new FileSystemWatcher(_folderPath)
             {
-                _homeFolderId = await _moveItClient.GetHomeFolderIdAsync();
-            }
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.Size,
+                Filter = "*.*",
+                EnableRaisingEvents = true
+            };
+
+            watcher.Created += async (sender, e) => await OnNewFileDetected(e.FullPath);
         }
 
+        private async Task OnNewFileDetected(string filePath)
+        {
+            string fileName = Path.GetFileName(filePath);
+            Console.WriteLine($"New file detected: {fileName}");
+
+            await _fileActions.UploadFileAsync(filePath, _homeFolderId, fileName);
+        }
     }
 }
