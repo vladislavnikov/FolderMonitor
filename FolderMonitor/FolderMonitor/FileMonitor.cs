@@ -2,6 +2,9 @@
 
 namespace FolderMonitor
 {
+    /// <summary>
+    /// Monitors a specified folder for new files and automatically uploads them using FileActions.
+    /// </summary>
     public class FileMonitor
     {
         private readonly string _folderPath;
@@ -24,6 +27,10 @@ namespace FolderMonitor
             watcher.Created += async (sender, e) => await OnNewFileDetected(e.FullPath);
         }
 
+        /// <summary>
+        /// Handles the event when a new file is detected in the monitored folder.
+        /// </summary>
+        /// <param name="filePath">The full path of the newly created file.</param>
         private async Task OnNewFileDetected(string filePath)
         {
             string fileName = Path.GetFileName(filePath);
